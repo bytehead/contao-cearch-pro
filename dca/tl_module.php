@@ -34,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['rootPages'] = array(
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>true, 'multiple'=>true, 'fieldType'=>'checkbox', 'tl_class'=>'clr'),
+    'eval'                    => array('mandatory'=>false, 'multiple'=>true, 'fieldType'=>'checkbox', 'tl_class'=>'clr'),
     'sql'                     => "blob NULL",
     'relation'                => array('type'=>'hasMany', 'load'=>'lazy')
 );

@@ -113,7 +113,7 @@ class Search
         // HOOK: add custom logic
         if (isset($GLOBALS['TL_HOOKS']['indexPage']) && is_array($GLOBALS['TL_HOOKS']['indexPage'])) {
             foreach ($GLOBALS['TL_HOOKS']['indexPage'] as $callback) {
-                \System::importStatic($callback[0])->$callback[1]($strContent, $arrData, $arrSet);
+                \System::importStatic($callback[0])->{$callback[1]}($strContent, $arrData, $arrSet);
             }
         }
 
@@ -145,12 +145,20 @@ class Search
 
         // Get description
         if (preg_match('/<meta[^>]+name="description"[^>]+content="([^"]*)"[^>]*>/i', $strHead, $tags)) {
-            $arrData['description'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($tags[1])));
+            if (version_compare(VERSION .'.'.BUILD, '3.5.1', '<')) {
+                $arrData['description'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($tags[1])));
+            } else {
+                $arrData['description'] = trim(preg_replace('/ +/', ' ', \StringUtil::decodeEntities($tags[1])));
+            }
         }
 
         // Get keywords
         if (preg_match('/<meta[^>]+name="keywords"[^>]+content="([^"]*)"[^>]*>/i', $strHead, $tags)) {
-            $arrData['keywords'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($tags[1])));
+            if (version_compare(VERSION .'.'.BUILD, '3.5.1', '<')) {
+                $arrData['keywords'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($tags[1])));
+            } else {
+                $arrData['keywords'] = trim(preg_replace('/ +/', ' ', \StringUtil::decodeEntities($tags[1])));
+            }
         }
 
         //Feedback: Steffen: Get OpenGraph Image
@@ -169,7 +177,13 @@ class Search
 
         // Put everything together
         $arrSet['text'] = $arrData['title'] . ' ' . $arrData['description'] . ' ' . $strBody . ' ' . $arrData['keywords'];
-        $arrSet['text'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($arrSet['text'])));
+
+        if (version_compare(VERSION .'.'.BUILD, '3.5.1', '<')) {
+            $arrSet['text'] = trim(preg_replace('/ +/', ' ', \String::decodeEntities($arrSet['text'])));
+        } else {
+            $arrSet['text'] = trim(preg_replace('/ +/', ' ', \StringUtil::decodeEntities($arrSet['text'])));
+        }
+
 
         //Feedback: Steffen: Add OpenGraph Image to Search index
         $arrSet['imageUrl'] = $arrData['image'];
@@ -303,7 +317,12 @@ class Search
     {
         // Clean the keywords
         $strKeywords = utf8_strtolower($strKeywords);
-        $strKeywords = \String::decodeEntities($strKeywords);
+
+        if (version_compare(VERSION .'.'.BUILD, '3.5.1', '<')) {
+            $strKeywords = \String::decodeEntities($strKeywords);
+        } else {
+            $strKeywords = \StringUtil::decodeEntities($strKeywords);
+        }
 
         if (function_exists('mb_eregi_replace')) {
             $strKeywords = mb_eregi_replace('[^[:alnum:] \*\+\'"\.:,_-]|\. |\.$|: |:$|, |,$', ' ', $strKeywords);

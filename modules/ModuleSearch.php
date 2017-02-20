@@ -119,7 +119,7 @@ class ModuleSearch extends \Module
             if (isset($GLOBALS['TL_HOOKS']['customizeSearch']) && is_array($GLOBALS['TL_HOOKS']['customizeSearch'])) {
                 foreach ($GLOBALS['TL_HOOKS']['customizeSearch'] as $callback) {
                     $this->import($callback[0]);
-                    $this->$callback[0]->$callback[1]($arrPages, $strKeywords, $strQueryType, $blnFuzzy);
+                    $this->{$callback[0]}->{$callback[1]}($arrPages, $strKeywords, $strQueryType, $blnFuzzy);
                 }
             }
 
@@ -258,7 +258,12 @@ class ModuleSearch extends \Module
 
                 // Shorten the context and highlight all keywords
                 if (!empty($arrContext)) {
-                    $objTemplate->context = trim(\String::substrHtml(implode('…', $arrContext), $this->totalLength));
+                    if (version_compare(VERSION .'.'.BUILD, '3.5.1', '<')) {
+                        $objTemplate->context = trim(\String::substrHtml(implode('…', $arrContext), $this->totalLength));
+                    } else {
+                        $objTemplate->context = trim(\StringUtil::substrHtml(implode('…', $arrContext), $this->totalLength));
+                    }
+
                     $objTemplate->context = preg_replace('/(\PL)(' . implode('|', $arrMatches) . ')(\PL)/ui', '$1<span class="highlight">$2</span>$3', $objTemplate->context);
 
                     $objTemplate->hasContext = true;
